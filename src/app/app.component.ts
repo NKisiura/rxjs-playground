@@ -1,13 +1,29 @@
 import { ChangeDetectionStrategy, Component } from "@angular/core";
+import { RouterLink, RouterOutlet } from "@angular/router";
+import { MatAnchor } from "@angular/material/button";
 
 @Component({
   selector: "app-root",
   standalone: true,
-  imports: [],
+  imports: [RouterOutlet, RouterLink, MatAnchor],
   templateUrl: "./app.component.html",
   styleUrl: "./app.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
-  public title = "title";
+  public readonly sidebarLinks: Link[] = [
+    {
+      route: "breakout",
+      label: "breakout",
+    },
+    {
+      route: "alphabet-invasion",
+      label: "alphabet invasion",
+    },
+  ];
+}
+
+interface Link {
+  readonly route: string;
+  readonly label: string;
 }

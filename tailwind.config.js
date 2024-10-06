@@ -2,7 +2,11 @@
 module.exports = {
   content: ["./src/**/*.{html,ts}"],
   theme: {
-    extend: {},
+    extend: {
+      spacing: {
+        "header-height": "75px",
+      },
+    },
   },
   plugins: [],
 };
