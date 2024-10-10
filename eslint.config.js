@@ -51,7 +51,6 @@ module.exports = tseslint.config(
         "error",
         {
           type: "attribute",
-          prefix: "app",
           style: "camelCase",
         },
       ],
@@ -100,7 +99,6 @@ module.exports = tseslint.config(
       "@angular-eslint/template/attributes-order": ["error"],
       "@angular-eslint/template/button-has-type": ["error"],
       "@angular-eslint/template/no-duplicate-attributes": ["error"],
-      "@angular-eslint/template/no-inline-styles": ["error"],
       "@angular-eslint/template/no-interpolation-in-attributes": ["error"],
       "@angular-eslint/template/prefer-control-flow": ["error"],
       "@angular-eslint/template/prefer-self-closing-tags": ["error"],
