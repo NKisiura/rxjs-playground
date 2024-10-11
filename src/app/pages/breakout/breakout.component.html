@@ -1,1 +1,42 @@
-<p>breakout works!</p>
+<div class="flex justify-center">
+  <div class="border border-pink-400">
+    <div
+      class="relative"
+      [ngStyle]="{
+        width: GAME_FIELD_SIZE.width | px,
+        height: GAME_FIELD_SIZE.height | px,
+      }"
+    >
+      @for (brick of bricks$ | async; track brick) {
+        <div
+          class="absolute rounded-sm bg-blue-700"
+          [ngStyle]="{
+            width: brick.width | px,
+            height: brick.height | px,
+            left: brick.x | px,
+            top: brick.y | px,
+          }"
+        ></div>
+      }
+      @if (ball$ | async; as ball) {
+        <div
+          class="absolute rounded-full bg-red-800"
+          [ngStyle]="{
+            width: BALL_RADIUS | px,
+            height: BALL_RADIUS | px,
+            left: ball.x | px,
+            top: ball.y | px,
+          }"
+        ></div>
+      }
+      <div
+        class="absolute bottom-0 rounded-sm bg-pink-700"
+        [ngStyle]="{
+          width: PADDLE_WIDTH | px,
+          height: PADDLE_HEIGHT | px,
+          left: paddlePosition$ | async | px,
+        }"
+      ></div>
+    </div>
+  </div>
+</div>
