@@ -9,8 +9,11 @@
       @for (link of sidebarLinks; track link.route) {
         <a
           mat-flat-button
-          class="whitespace-nowrap !capitalize"
+          class="relative whitespace-nowrap !capitalize"
           [routerLink]="link.route"
+          [routerLinkActive]="
+            'before:absolute before:-right-4 before:border-[10px] before:border-l-0 before:border-transparent before:border-r-pink-700'
+          "
         >
           {{ link.label }}
         </a>

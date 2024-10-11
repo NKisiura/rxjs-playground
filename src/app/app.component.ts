@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component } from "@angular/core";
-import { RouterLink, RouterOutlet } from "@angular/router";
+import { RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
 import { MatAnchor } from "@angular/material/button";
 
 @Component({
   selector: "app-root",
   standalone: true,
-  imports: [RouterOutlet, RouterLink, MatAnchor],
+  imports: [RouterOutlet, RouterLink, MatAnchor, RouterLinkActive],
   templateUrl: "./app.component.html",
   styleUrl: "./app.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
