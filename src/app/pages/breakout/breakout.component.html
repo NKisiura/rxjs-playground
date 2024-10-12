@@ -32,8 +32,8 @@
       <div
         class="absolute bottom-0 rounded-sm bg-pink-700"
         [ngStyle]="{
-          width: PADDLE_WIDTH | px,
-          height: PADDLE_HEIGHT | px,
+          width: PADDLE_SIZE.width | px,
+          height: PADDLE_SIZE.height | px,
           left: paddlePosition$ | async | px,
         }"
       ></div>
