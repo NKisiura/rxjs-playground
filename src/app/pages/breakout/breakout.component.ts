@@ -20,17 +20,23 @@ import {
   withLatestFrom,
 } from "rxjs";
 import { PxPipe } from "@shared/pipes/px";
-import { Coordinates, Objects, PaddleDirection } from "./types";
+import { Objects, PaddleDirection } from "./types";
 import {
   BALL_RADIUS,
-  BALL_SPEED,
   GAME_FIELD_SIZE,
   PADDLE_KEY,
   PADDLE_SIZE,
   PADDLE_SPEED,
   TICKER_INTERVAL,
 } from "./constants";
-import { bricksFactory } from "./helpers";
+import {
+  bricksFactory,
+  defineBallBrickCollision,
+  defineCollisions,
+  defineNextBallDirection,
+  defineNextBallPosition,
+  filterArrowKeys,
+} from "./helpers";
 
 @Component({
   selector: "app-breakout",
@@ -114,9 +120,7 @@ export class BreakoutComponent implements OnInit {
   private userInput$ = merge(
     this.keydownEvent$.pipe(
       map(({ key }) => key),
-      filter((key) => {
-        return [PADDLE_KEY.left, PADDLE_KEY.right].includes(key);
-      }),
+      filter(filterArrowKeys),
       map((key: string) => {
         return (key === PADDLE_KEY.left ? -1 : 1) as PaddleDirection;
       }),
@@ -130,10 +134,13 @@ export class BreakoutComponent implements OnInit {
       (position, [ticker, direction]) => {
         const minPosition = 0;
         const maxPosition = GAME_FIELD_SIZE.width - PADDLE_SIZE.width;
-        const nextPosition =
+        const nextPredictedPosition =
           position + direction * ticker.deltaTime * PADDLE_SPEED;
 
-        return Math.max(Math.min(nextPosition, maxPosition), minPosition);
+        return Math.max(
+          Math.min(nextPredictedPosition, maxPosition),
+          minPosition,
+        );
       },
       GAME_FIELD_SIZE.width / 2 - PADDLE_SIZE.width / 2,
     ),
@@ -142,75 +149,17 @@ export class BreakoutComponent implements OnInit {
   private readonly objects$ = this.ticker$.pipe(
     withLatestFrom(this.paddle$),
     scan(({ ball, bricks }, [ticker, paddle]): Objects => {
-      const predictedXPosition =
-        ball.position.x + ball.direction.x * ticker.deltaTime * BALL_SPEED;
-      const predicatedYPosition =
-        ball.position.y + ball.direction.y * ticker.deltaTime * BALL_SPEED;
-      const nextXPosition = Math.min(
-        Math.max(0, predictedXPosition),
-        GAME_FIELD_SIZE.width - BALL_RADIUS,
-      );
-      const nextYPosition = Math.min(
-        Math.max(0, predicatedYPosition),
-        GAME_FIELD_SIZE.height - BALL_RADIUS,
-      );
-
-      const newBallPosition: Coordinates = {
-        x: nextXPosition,
-        y: nextYPosition,
-      };
-
-      const ballHitPaddle =
-        newBallPosition.x + BALL_RADIUS >= paddle &&
-        newBallPosition.x <= paddle + PADDLE_SIZE.width &&
-        newBallPosition.y + BALL_RADIUS >=
-          GAME_FIELD_SIZE.height - PADDLE_SIZE.height;
-
-      const ballHitWall =
-        newBallPosition.x <= 0 ||
-        newBallPosition.x + BALL_RADIUS >= GAME_FIELD_SIZE.width;
-
-      const ballHitCeiling = newBallPosition.y <= 0;
-
-      const ballHitFloor =
-        newBallPosition.y + BALL_RADIUS >= GAME_FIELD_SIZE.height;
-
-      const ballHitBrick = bricks.some((brick) => {
-        return (
-          newBallPosition.x + BALL_RADIUS >= brick.x &&
-          newBallPosition.x <= brick.x + brick.width &&
-          newBallPosition.y + BALL_RADIUS >= brick.y &&
-          newBallPosition.y <= brick.y + brick.height
-        );
-      });
-
+      const nextBallPosition = defineNextBallPosition(ball, ticker.deltaTime);
+      const collisions = defineCollisions(nextBallPosition, paddle, bricks);
+      const nextBallDirection = defineNextBallDirection(ball, collisions);
       const brickSurvivors = bricks.filter((brick) => {
-        return !(
-          newBallPosition.x + BALL_RADIUS >= brick.x &&
-          newBallPosition.x <= brick.x + brick.width &&
-          newBallPosition.y + BALL_RADIUS >= brick.y &&
-          newBallPosition.y <= brick.y + brick.height
-        );
+        return !defineBallBrickCollision(nextBallPosition, brick);
       });
-
-      const newBallDirection: Coordinates = {
-        x: ballHitWall ? -ball.direction.x : ball.direction.x,
-        y:
-          ballHitBrick || ballHitPaddle || ballHitCeiling ?
-            -ball.direction.y
-          : ball.direction.y,
-      };
 
       return {
-        ball: { position: newBallPosition, direction: newBallDirection },
+        ball: { position: nextBallPosition, direction: nextBallDirection },
         bricks: brickSurvivors,
-        collisions: {
-          paddle: ballHitPaddle,
-          floor: ballHitFloor,
-          wall: ballHitWall,
-          ceiling: ballHitCeiling,
-          brick: ballHitBrick,
-        },
+        collisions: collisions,
       };
     }, this.INITIAL_OBJECTS),
   );
