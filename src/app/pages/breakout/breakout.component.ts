@@ -17,10 +17,11 @@ import {
   merge,
   scan,
   shareReplay,
+  tap,
   withLatestFrom,
 } from "rxjs";
 import { PxPipe } from "@shared/pipes/px";
-import { Objects, PaddleDirection } from "./types";
+import { InfoWindow, Objects, PaddleDirection } from "./types";
 import {
   BALL_RADIUS,
   GAME_FIELD_SIZE,
@@ -73,6 +74,11 @@ export class BreakoutComponent implements OnInit {
       brick: false,
     },
   };
+
+  private readonly infoWindowSubject = new BehaviorSubject<InfoWindow | null>(
+    null,
+  );
+  public readonly infoWindow$ = this.infoWindowSubject.asObservable();
 
   private readonly paddlePositionSubject = new BehaviorSubject(
     GAME_FIELD_SIZE.width / 2 - PADDLE_SIZE.width / 2,
@@ -164,7 +170,46 @@ export class BreakoutComponent implements OnInit {
     }, this.INITIAL_OBJECTS),
   );
 
-  public startGame(): void {
+  ngOnInit(): void {
+    this.prepareNewGame({ title: "WELCOME!", message: "start the game!" });
+  }
+
+  private prepareNewGame(infoWindow: InfoWindow): void {
+    this.showInfoWindow(infoWindow);
+    this.resetObjects();
+    this.setupStartGameListener();
+  }
+
+  private showInfoWindow(infoWindow: InfoWindow): void {
+    this.infoWindowSubject.next(infoWindow);
+  }
+
+  private closeInfoWindow(): void {
+    this.infoWindowSubject.next(null);
+  }
+
+  private resetObjects(): void {
+    this.paddlePositionSubject.next(
+      GAME_FIELD_SIZE.width / 2 - PADDLE_SIZE.width / 2,
+    );
+    this.objectsSubject.next(this.INITIAL_OBJECTS);
+  }
+
+  private setupStartGameListener(): void {
+    const startGameSub = this.keydownEvent$
+      .pipe(
+        map(({ key }) => key),
+        filter((key) => key === " "),
+        tap(() => {
+          this.closeInfoWindow();
+          this.startGame();
+          startGameSub.unsubscribe();
+        }),
+      )
+      .subscribe();
+  }
+
+  private startGame(): void {
     const gameSubscription = combineLatest([
       this.ticker$,
       this.paddle$,
@@ -174,18 +219,14 @@ export class BreakoutComponent implements OnInit {
       this.objectsSubject.next(objects);
 
       if (objects.collisions.floor) {
-        alert("Game over");
+        this.prepareNewGame({ title: "GAME OVER!", message: "try again!" });
         gameSubscription.unsubscribe();
       }
 
       if (!objects.bricks.length) {
-        alert("Congratulations");
+        this.prepareNewGame({ title: "YOU WIN!", message: "play again!" });
         gameSubscription.unsubscribe();
       }
     });
-  }
-
-  ngOnInit(): void {
-    this.startGame();
   }
 }

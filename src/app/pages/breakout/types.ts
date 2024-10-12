@@ -30,3 +30,8 @@ export interface Objects {
   readonly bricks: Brick[];
   readonly collisions: Collisions;
 }
+
+export interface InfoWindow {
+  readonly title: string;
+  readonly message: string;
+}
