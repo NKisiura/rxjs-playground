@@ -1,4 +1,4 @@
-import { Ball, Brick, Collisions, Coordinates } from "./types";
+import { Ball, Brick, Collisions } from "./types";
 import {
   BALL_RADIUS,
   BALL_SPEED,
@@ -10,6 +10,7 @@ import {
   PADDLE_KEY,
   PADDLE_SIZE,
 } from "./constants";
+import { Coordinates } from "@shared/types";
 
 export const bricksFactory = (): Brick[] => {
   const totalGaps = BRICK_COLUMNS + 1;

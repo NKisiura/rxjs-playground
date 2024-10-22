@@ -1,4 +1,4 @@
-import { Size } from "./types";
+import { Size } from "@shared/types";
 
 export const TICKER_INTERVAL = 17;
 
