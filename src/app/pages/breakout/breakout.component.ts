@@ -21,7 +21,8 @@ import {
   withLatestFrom,
 } from "rxjs";
 import { PxPipe } from "@shared/pipes/px";
-import { InfoWindow, Objects, PaddleDirection } from "./types";
+import { InfoWindow } from "@shared/types";
+import { Objects, PaddleDirection } from "./types";
 import {
   BALL_RADIUS,
   GAME_FIELD_SIZE,
