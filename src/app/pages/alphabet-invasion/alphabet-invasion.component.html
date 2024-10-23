@@ -1,1 +1,52 @@
-<p>alphabet-invasion works!</p>
+<div class="relative flex flex-col items-center">
+  @let game = game$ | async;
+  @let score = game?.score || 0;
+  @let level = game?.level || 1;
+  @let letters = game?.letters || [];
+  @let bestScore = bestScore$ | async;
+
+  <div>BEST SCORE: {{ bestScore }}</div>
+  <div class="">Level: {{ level }} Score: {{ score }}</div>
+  <div class="border border-gray-300">
+    <div
+      class="flex"
+      [ngStyle]="{
+        width: GAME_FIELD.width | px,
+        height: GAME_FIELD.height | px,
+      }"
+    >
+      <div class="absolute">
+        @for (letter of letters; track letter) {
+          <div
+            class="relative"
+            [ngStyle]="{
+              left: letter.xPosition | px,
+            }"
+          >
+            {{ letter.letter }}
+          </div>
+        }
+      </div>
+      <div
+        class="h-px w-full self-end border-b border-dashed border-red-500"
+      ></div>
+    </div>
+  </div>
+
+  @if (infoWindow$ | async; as infoWindow) {
+    <div
+      class="absolute left-1/2 top-1/4 z-10 flex -translate-x-1/2 flex-col items-center gap-4 rounded-lg bg-pink-700 p-4 text-white shadow-xl shadow-black/25"
+    >
+      <span class="text-2xl">{{ infoWindow.title }}</span>
+      <span>
+        Press
+        <span
+          class="rounded-md border border-b-2 border-gray-400 bg-white px-2 py-0.5 text-gray-400"
+        >
+          Space
+        </span>
+        to {{ infoWindow.message }}
+      </span>
+    </div>
+  }
+</div>
