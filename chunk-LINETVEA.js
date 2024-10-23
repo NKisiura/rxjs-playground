@@ -1,0 +1,1 @@
+import{da as t}from"./chunk-ARPSXJKY.js";var e=class n{transform(r){return r?`${r.toString()}px`:null}static \u0275fac=function(u){return new(u||n)};static \u0275pipe=t({name:"px",type:n,pure:!0,standalone:!0})};export{e as a};
